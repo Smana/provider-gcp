@@ -1022,6 +1022,19 @@ type NetworkConfigSpec struct {
 	// for this cluster.
 	// This makes same node pod to pod traffic visible for VPC network.
 	EnableIntraNodeVisibility bool `json:"enableIntraNodeVisibility"`
+
+	// DatapathProvider: The desired datapath provider for this cluster. By
+	// default, uses the IPTables-based kube-proxy implementation.
+	//
+	// Possible values:
+	//   "DATAPATH_PROVIDER_UNSPECIFIED" - Default value.
+	//   "LEGACY_DATAPATH" - Use the IPTables implementation based on
+	// kube-proxy.
+	//   "ADVANCED_DATAPATH" - Use the eBPF based GKE Dataplane V2 with
+	// additional features. See the [GKE Dataplane V2
+	// documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/
+	// dataplane-v2) for more.
+	DatapathProvider string `json:"datapathProvider"`
 }
 
 // NetworkConfigStatus reports the relative names of network &

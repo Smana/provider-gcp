@@ -936,12 +936,14 @@ func TestGenerateNetworkConfig(t *testing.T) {
 				params: params(func(p *v1beta1.GKEClusterParameters) {
 					p.NetworkConfig = &v1beta1.NetworkConfigSpec{
 						EnableIntraNodeVisibility: true,
+						DatapathProvider:          "ADVANCED_DATAPATH",
 					}
 				}),
 			},
 			want: cluster(func(c *container.Cluster) {
 				c.NetworkConfig = &container.NetworkConfig{
 					EnableIntraNodeVisibility: true,
+					DatapathProvider:          "ADVANCED_DATAPATH",
 				}
 			}),
 		},
@@ -1075,10 +1077,9 @@ func TestGeneratePrivateClusterConfig(t *testing.T) {
 			},
 			want: cluster(func(c *container.Cluster) {
 				c.PrivateClusterConfig = &container.PrivateClusterConfig{
-					EnablePeeringRouteSharing: true,
-					EnablePrivateEndpoint:     true,
-					EnablePrivateNodes:        true,
-					MasterIpv4CidrBlock:       "0.0.0.0/0",
+					EnablePrivateEndpoint: true,
+					EnablePrivateNodes:    true,
+					MasterIpv4CidrBlock:   "0.0.0.0/0",
 				}
 			}),
 		},
@@ -1094,10 +1095,9 @@ func TestGeneratePrivateClusterConfig(t *testing.T) {
 			},
 			want: cluster(func(c *container.Cluster) {
 				c.PrivateClusterConfig = &container.PrivateClusterConfig{
-					EnablePeeringRouteSharing: true,
-					EnablePrivateEndpoint:     false,
-					EnablePrivateNodes:        false,
-					MasterIpv4CidrBlock:       "0.0.0.0/0",
+					EnablePrivateEndpoint: false,
+					EnablePrivateNodes:    false,
+					MasterIpv4CidrBlock:   "0.0.0.0/0",
 				}
 			}),
 		},
@@ -1169,49 +1169,6 @@ func TestGenerateResourceUsageExportConfig(t *testing.T) {
 			GenerateResourceUsageExportConfig(tc.args.params.ResourceUsageExportConfig, tc.args.cluster)
 			if diff := cmp.Diff(tc.want.ResourceUsageExportConfig, tc.args.cluster.ResourceUsageExportConfig); diff != "" {
 				t.Errorf("GenerateResourceUsageExportConfig(...): -want, +got:\n%s", diff)
-			}
-		})
-	}
-}
-
-func TestGenerateTierSettings(t *testing.T) {
-	type args struct {
-		cluster *container.Cluster
-		params  *v1beta1.GKEClusterParameters
-	}
-
-	tests := map[string]struct {
-		args args
-		want *container.Cluster
-	}{
-		"Successful": {
-			args: args{
-				cluster: cluster(),
-				params: params(func(p *v1beta1.GKEClusterParameters) {
-					p.TierSettings = &v1beta1.TierSettings{
-						Tier: "STANDARD",
-					}
-				}),
-			},
-			want: cluster(func(c *container.Cluster) {
-				c.TierSettings = &container.TierSettings{
-					Tier: "STANDARD",
-				}
-			}),
-		},
-		"SuccessfulNil": {
-			args: args{
-				cluster: cluster(),
-				params:  params(),
-			},
-			want: cluster(),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			GenerateTierSettings(tc.args.params.TierSettings, tc.args.cluster)
-			if diff := cmp.Diff(tc.want.TierSettings, tc.args.cluster.TierSettings); diff != "" {
-				t.Errorf("GenerateTierSettings(...): -want, +got:\n%s", diff)
 			}
 		})
 	}
